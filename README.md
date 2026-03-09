@@ -13,7 +13,7 @@
 > **Project Context:** Final Year R&D Undergraduate Internship (PFE) - Academic Year 2025/2026  
 > **Institution:** ESPRIT School of Engineering  
 > **Principal Investigator / Supervisor:** Afif Beji, Eng. MSc.  
-> **Intern:** Yassine Ben Necib<br>
+> **Intern:** Yassine Ben Ncib<br>
 
 
 An AI-driven adaptive learning platform designed to support the study of **Numerical Analysis and Scientific Computing** through personalized learning paths, knowledge graphs, and intelligent tutoring.
