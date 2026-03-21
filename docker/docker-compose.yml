@@ -5,7 +5,7 @@ services:
   neo4j:
     image: neo4j:5
     ports:
-      - "7474:7474" # HTTP port for the Neo4j Browser (Visual interface)
+      - "7475:7474" # HTTP port for the Neo4j Browser (Visual interface)
       - "7687:7687" # Bolt port to connect the Python backend later
     environment:
       - NEO4J_AUTH=neo4j/monmotdepasse123
@@ -14,7 +14,7 @@ services:
   postgres:
     image: postgres:15
     ports:
-      - "5432:5432" # Standard PostgreSQL port
+      - "5433:5432" # CHANGEMENT ICI : Windows utilise 5433, Docker écoute sur 5432
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=monmotdepasse123
