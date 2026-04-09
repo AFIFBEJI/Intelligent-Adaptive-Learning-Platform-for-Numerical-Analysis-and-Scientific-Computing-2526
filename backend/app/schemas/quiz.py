@@ -36,10 +36,9 @@ class QuizResponse(BaseModel):
 
 class QuizResultCreate(BaseModel):
     """Schema for submitting quiz results."""
-    quiz_id: int
     score: float
     temps_reponse: int
-    reponses: Optional[Dict[str, Any]] = None
+    reponses: Optional[Any] = None
 
 
 class QuizResultResponse(BaseModel):

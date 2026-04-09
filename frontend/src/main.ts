@@ -8,6 +8,7 @@ import { LoginPage } from './pages/login'
 import { RegisterPage } from './pages/register'
 import { DashboardPage } from './pages/dashboard'
 import { ConceptsPage } from './pages/concepts'
+import { QuizPage } from './pages/quiz'
 
 // Restaurer le token au démarrage
 const token = localStorage.getItem('token')
@@ -23,6 +24,7 @@ router
   .addRoute('/register', RegisterPage, false)
   .addRoute('/dashboard', DashboardPage, true)
   .addRoute('/concepts', ConceptsPage, true)
+  .addRoute('/quiz', QuizPage, true)
 
 // Démarrer le router
 router.start()
