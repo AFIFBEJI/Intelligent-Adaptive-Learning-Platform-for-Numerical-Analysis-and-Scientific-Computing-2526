@@ -459,15 +459,22 @@ def main():
     Les paramètres de connexion sont lus depuis le fichier .env
     """
     import os
+    import sys
     from dotenv import load_dotenv
 
     # Charger les variables depuis .env (2 niveaux au-dessus : backend/scripts/ → racine)
     dotenv_path = os.path.join(os.path.dirname(__file__), "../../.env")
     load_dotenv(dotenv_path)
 
-    NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7688")
-    NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
-    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "monmotdepasse123")
+    NEO4J_URI = os.getenv("NEO4J_URI")
+    NEO4J_USER = os.getenv("NEO4J_USER")
+    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+
+    # Vérifier que toutes les variables sont présentes
+    if not all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]):
+        logger.error("❌ Variables manquantes dans .env : NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD")
+        logger.error(f"   Fichier .env cherché : {os.path.abspath(dotenv_path)}")
+        sys.exit(1)
 
     logger.info(f"Connexion à Neo4j : {NEO4J_URI} avec l'utilisateur {NEO4J_USER}")
 

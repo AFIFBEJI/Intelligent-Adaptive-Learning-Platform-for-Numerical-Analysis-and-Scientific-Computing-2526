@@ -1,40 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.security import hacher_mot_de_passe
+from app.core.security import hacher_mot_de_passe, get_current_user
 from app.models.etudiant import Etudiant
 from app.schemas.etudiant import EtudiantCreate, EtudiantResponse, EtudiantUpdate
 
 router = APIRouter(prefix="/etudiants", tags=["etudiants"])
 
 
-@router.post("/", response_model=EtudiantResponse)
-def creer_etudiant(etudiant: EtudiantCreate, db: Session = Depends(get_db)):
-    etudiant_existant = db.query(Etudiant).filter(
-        Etudiant.email == etudiant.email
-    ).first()
-    if etudiant_existant:
-        raise HTTPException(status_code=400, detail="Cet email est déjà utilisé.")
-
-    nouvel_etudiant = Etudiant(
-        nom_complet=etudiant.nom_complet,
-        email=etudiant.email,
-        mot_de_passe=hacher_mot_de_passe(etudiant.mot_de_passe),
-        niveau_actuel=etudiant.niveau_actuel
-    )
-    db.add(nouvel_etudiant)
-    db.commit()
-    db.refresh(nouvel_etudiant)
-    return nouvel_etudiant
-
-
 @router.get("/", response_model=list[EtudiantResponse])
-def lire_tous_les_etudiants(db: Session = Depends(get_db)):
+def lire_tous_les_etudiants(
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user)
+):
     return db.query(Etudiant).all()
 
 
 @router.get("/{etudiant_id}", response_model=EtudiantResponse)
-def lire_un_etudiant(etudiant_id: int, db: Session = Depends(get_db)):
+def lire_un_etudiant(
+    etudiant_id: int,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user)
+):
     etudiant = db.query(Etudiant).filter(Etudiant.id == etudiant_id).first()
     if etudiant is None:
         raise HTTPException(status_code=404, detail="Étudiant introuvable.")
@@ -42,7 +29,16 @@ def lire_un_etudiant(etudiant_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{etudiant_id}", response_model=EtudiantResponse)
-def modifier_etudiant(etudiant_id: int, modifications: EtudiantUpdate, db: Session = Depends(get_db)):
+def modifier_etudiant(
+    etudiant_id: int,
+    modifications: EtudiantUpdate,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user)
+):
+    # Un étudiant ne peut modifier que son propre profil
+    if current_user_id != etudiant_id:
+        raise HTTPException(status_code=403, detail="Vous ne pouvez modifier que votre propre profil.")
+
     etudiant = db.query(Etudiant).filter(Etudiant.id == etudiant_id).first()
     if etudiant is None:
         raise HTTPException(status_code=404, detail="Étudiant introuvable.")
@@ -62,7 +58,15 @@ def modifier_etudiant(etudiant_id: int, modifications: EtudiantUpdate, db: Sessi
 
 
 @router.delete("/{etudiant_id}")
-def supprimer_etudiant(etudiant_id: int, db: Session = Depends(get_db)):
+def supprimer_etudiant(
+    etudiant_id: int,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user)
+):
+    # Un étudiant ne peut supprimer que son propre compte
+    if current_user_id != etudiant_id:
+        raise HTTPException(status_code=403, detail="Vous ne pouvez supprimer que votre propre compte.")
+
     etudiant = db.query(Etudiant).filter(Etudiant.id == etudiant_id).first()
     if etudiant is None:
         raise HTTPException(status_code=404, detail="Étudiant introuvable.")

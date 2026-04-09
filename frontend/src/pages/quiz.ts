@@ -2,7 +2,8 @@
 // Quiz Page — Interactive 3D Quiz with Glassmorphism
 // ============================================================
 
-import { api, Quiz, QuizResult } from '../api'
+import { api } from '../api'
+import type { Quiz } from '../api'
 import { createNavbar } from '../components/navbar'
 
 export function QuizPage(): HTMLElement {

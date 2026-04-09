@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, UniqueConstraint
-from datetime import datetime
+from datetime import datetime, timezone
 from app.core.database import Base
 
 
@@ -14,7 +14,7 @@ class ConceptMastery(Base):
     etudiant_id = Column(Integer, ForeignKey("etudiants.id", ondelete="CASCADE"), nullable=False, index=True)
     concept_neo4j_id = Column(String(255), nullable=False, index=True)  # ID of concept in Neo4j
     niveau_maitrise = Column(Float, default=0.0, nullable=False)  # 0-100
-    derniere_mise_a_jour = Column(DateTime, default=datetime.utcnow, nullable=False)
+    derniere_mise_a_jour = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Ensure one mastery record per student-concept pair
     __table_args__ = (
