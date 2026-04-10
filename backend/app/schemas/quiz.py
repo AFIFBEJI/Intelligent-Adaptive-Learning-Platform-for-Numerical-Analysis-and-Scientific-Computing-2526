@@ -48,7 +48,7 @@ class QuizResultResponse(BaseModel):
     quiz_id: int
     score: float
     temps_reponse: int
-    reponses: Optional[Dict[str, Any]] = None
+    reponses: Optional[Any] = None
     date_tentative: datetime
 
     class Config:
