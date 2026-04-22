@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from app.core.database import get_db
-from app.core.security import hacher_mot_de_passe, get_current_user
+from app.core.security import get_current_user, hacher_mot_de_passe
 from app.models.etudiant import Etudiant
-from app.schemas.etudiant import EtudiantCreate, EtudiantResponse, EtudiantUpdate
+from app.schemas.etudiant import EtudiantResponse, EtudiantUpdate
 
 router = APIRouter(prefix="/etudiants", tags=["etudiants"])
 

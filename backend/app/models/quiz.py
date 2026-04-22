@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey
+from datetime import UTC, datetime
+
+from sqlalchemy import JSON, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from datetime import datetime, timezone
+
 from app.core.database import Base
 
 
@@ -15,7 +17,7 @@ class Quiz(Base):
     module = Column(String(255), nullable=False, index=True)
     difficulte = Column(String(50), nullable=False)  # facile, moyen, difficile
     questions = Column(JSON, nullable=False)  # Array of question objects
-    date_creation = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    date_creation = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     # Relationships
     resultats = relationship("QuizResult", back_populates="quiz", cascade="all, delete-orphan")
@@ -36,7 +38,7 @@ class QuizResult(Base):
     score = Column(Float, nullable=False)  # 0-100
     temps_reponse = Column(Integer, nullable=False)  # in seconds
     reponses = Column(JSON, nullable=True)  # Detailed student answers
-    date_tentative = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
+    date_tentative = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False, index=True)
 
     # Relationships
     quiz = relationship("Quiz", back_populates="resultats")

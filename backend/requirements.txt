@@ -1,14 +1,89 @@
+# ============================================================
+# Dépendances Backend - Adaptive Learning Platform PFE
+# ============================================================
+
+# --- Framework Web ---
+# FastAPI : le framework web qu'on utilise pour créer notre API REST
+# C'est comme Express.js mais pour Python, ultra rapide et moderne
 fastapi
+
+# Uvicorn : le serveur qui "lance" notre application FastAPI
+# FastAPI tout seul ne peut pas recevoir des requêtes HTTP,
+# il a besoin d'un serveur ASGI (comme Uvicorn) pour écouter sur un port
 uvicorn[standard]
+
+# --- Base de données PostgreSQL ---
+# SQLAlchemy : un ORM (Object-Relational Mapping)
+# Au lieu d'écrire du SQL brut, on manipule des objets Python
+# Ex: au lieu de "SELECT * FROM etudiants", on écrit db.query(Etudiant).all()
 sqlalchemy
+
+# psycopg2 : le "pilote" qui permet à Python de parler à PostgreSQL
+# SQLAlchemy est générique, psycopg2 est le traducteur spécifique PostgreSQL
 psycopg2-binary
+
+# --- Validation de données ---
+# Pydantic : valide automatiquement les données entrantes
+# Si un étudiant envoie email="pas_un_email", Pydantic rejette la requête
 pydantic
 pydantic-settings
+
+# --- Sécurité & Authentification ---
+# passlib + bcrypt : pour hasher les mots de passe
+# On ne stocke JAMAIS le mot de passe en clair, on le transforme en code illisible
+# "monmotdepasse" → "$2b$12$LJ3m4ys..." (irréversible)
 passlib[bcrypt]
 bcrypt
+
+# python-jose : pour créer et vérifier les JWT (JSON Web Tokens)
+# Quand un étudiant se connecte, on lui donne un "badge" (token)
+# qu'il montre à chaque requête pour prouver son identité
 python-jose[cryptography]
+
+# python-dotenv : lit les variables secrètes depuis le fichier .env
+# On ne met JAMAIS les mots de passe dans le code, on les met dans .env
 python-dotenv
+
+# --- Base de données Neo4j (Graphe de connaissances) ---
+# neo4j : le pilote Python pour communiquer avec Neo4j
+# Neo4j stocke les concepts et leurs relations (REQUIRES, COVERS, etc.)
 neo4j
+
+# --- Calcul Scientifique ---
+# numpy : calculs numériques (tableaux, matrices, opérations mathématiques)
 numpy
+
+# scipy : algorithmes scientifiques avancés (intégration, interpolation, EDOs)
 scipy
+
+# sympy : calcul symbolique (comme une calculatrice qui comprend les formules)
+# Ex: sympy sait que la dérivée de x² est 2x
+# On l'utilise pour VÉRIFIER que les réponses de l'IA sont mathématiquement correctes
 sympy
+
+# ============================================================
+# NOUVEAU - Phase 2 : Tuteur IA GraphRAG
+# ============================================================
+
+# --- LangChain : le chef d'orchestre de l'IA ---
+# LangChain coordonne tout le pipeline :
+# 1. Prend la question de l'étudiant
+# 2. Va chercher le contexte dans Neo4j (prérequis, maîtrise)
+# 3. Construit un prompt adapté au niveau de l'étudiant
+# 4. Envoie le tout à Gemini
+# 5. Retourne la réponse
+langchain>=0.3.0
+
+# langchain-google-genai : le connecteur LangChain ↔ Google Gemini
+# LangChain est générique, ce package lui dit "voici comment parler à Gemini"
+langchain-google-genai>=2.0.0
+
+# google-generativeai : la librairie officielle Google pour l'API Gemini
+# C'est elle qui envoie vraiment les requêtes HTTP à Google
+google-generativeai>=0.8.0
+
+# langchain-ollama : le connecteur LangChain ↔ Ollama (modèle local)
+# Permet d'utiliser des modèles d'IA qui tournent sur ton PC (pas d'internet)
+# Ollama est le FALLBACK : si Gemini est indisponible (quota épuisé),
+# le système bascule automatiquement sur Ollama. L'étudiant ne voit rien.
+langchain-ollama>=0.3.0

@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import UTC, datetime
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
-from datetime import datetime, timezone
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models.quiz import Quiz, QuizResult
 from app.models.mastery import ConceptMastery
+from app.models.quiz import Quiz, QuizResult
 from app.schemas.quiz import (
     QuizCreate,
     QuizResponse,
@@ -30,10 +30,10 @@ MODULE_CONCEPT_MAP = {
         "concept_trapezoidal", "concept_simpson",
         "concept_gaussian_quadrature"
     ],
-    "ODEs": [
-        "concept_initial_value", "concept_taylor_series",
-        "concept_euler", "concept_improved_euler",
-        "concept_rk4"
+    "Polynomial Approximation & Optimization": [
+        "concept_least_squares", "concept_orthogonal_polynomials",
+        "concept_minimax_approximation", "concept_gradient_descent",
+        "concept_newton_optimization"
     ],
 }
 
@@ -48,10 +48,10 @@ DIFFICULTY_CONCEPT_MAP = {
         "moyen": "concept_trapezoidal",
         "difficile": "concept_gaussian_quadrature",
     },
-    "ODEs": {
-        "facile": "concept_initial_value",
-        "moyen": "concept_euler",
-        "difficile": "concept_rk4",
+    "Polynomial Approximation & Optimization": {
+        "facile": "concept_least_squares",
+        "moyen": "concept_orthogonal_polynomials",
+        "difficile": "concept_newton_optimization",
     },
 }
 
@@ -66,13 +66,13 @@ def update_mastery(db: Session, etudiant_id: int, concept_id: str, score: float)
     if mastery:
         # Weighted average: 60% old + 40% new score
         mastery.niveau_maitrise = round(mastery.niveau_maitrise * 0.6 + score * 0.4, 1)
-        mastery.derniere_mise_a_jour = datetime.now(timezone.utc)
+        mastery.derniere_mise_a_jour = datetime.now(UTC)
     else:
         mastery = ConceptMastery(
             etudiant_id=etudiant_id,
             concept_neo4j_id=concept_id,
             niveau_maitrise=round(score, 1),
-            derniere_mise_a_jour=datetime.now(timezone.utc)
+            derniere_mise_a_jour=datetime.now(UTC)
         )
         db.add(mastery)
 
@@ -96,7 +96,7 @@ def create_quiz(
     return nouveau_quiz
 
 
-@router.get("/", response_model=List[QuizResponse])
+@router.get("/", response_model=list[QuizResponse])
 def list_quiz(
     module: str = None,
     difficulte: str = None,
@@ -172,7 +172,7 @@ def submit_quiz(
     return quiz_result
 
 
-@router.get("/results/{etudiant_id}", response_model=List[QuizResultResponse])
+@router.get("/results/{etudiant_id}", response_model=list[QuizResultResponse])
 def get_student_results(
     etudiant_id: int,
     skip: int = 0,

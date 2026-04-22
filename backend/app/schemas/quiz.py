@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel
 
 
 class QuestionSchema(BaseModel):
@@ -8,8 +9,8 @@ class QuestionSchema(BaseModel):
     id: int
     question: str
     type: str  # multiple_choice, short_answer, true_false
-    options: Optional[List[str]] = None
-    correct_answer: Optional[str] = None
+    options: list[str] | None = None
+    correct_answer: str | None = None
     points: int = 1
 
 
@@ -18,7 +19,7 @@ class QuizCreate(BaseModel):
     titre: str
     module: str
     difficulte: str  # facile, moyen, difficile
-    questions: List[Dict[str, Any]]
+    questions: list[dict[str, Any]]
 
 
 class QuizResponse(BaseModel):
@@ -27,7 +28,7 @@ class QuizResponse(BaseModel):
     titre: str
     module: str
     difficulte: str
-    questions: List[Dict[str, Any]]
+    questions: list[dict[str, Any]]
     date_creation: datetime
 
     class Config:
@@ -38,7 +39,7 @@ class QuizResultCreate(BaseModel):
     """Schema for submitting quiz results."""
     score: float
     temps_reponse: int
-    reponses: Optional[Any] = None
+    reponses: Any | None = None
 
 
 class QuizResultResponse(BaseModel):
@@ -48,7 +49,7 @@ class QuizResultResponse(BaseModel):
     quiz_id: int
     score: float
     temps_reponse: int
-    reponses: Optional[Any] = None
+    reponses: Any | None = None
     date_tentative: datetime
 
     class Config:

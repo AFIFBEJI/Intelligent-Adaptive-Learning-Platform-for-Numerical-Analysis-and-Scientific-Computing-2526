@@ -14,14 +14,14 @@ Prerequisites:
     - .env configured
 """
 
+import logging
 import os
 import sys
-import logging
-from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from dotenv import load_dotenv
+
 dotenv_path = os.path.join(os.path.dirname(__file__), "../../.env")
 load_dotenv(dotenv_path)
 
@@ -1067,12 +1067,12 @@ def seed_quizzes():
         modules = set(q["module"] for q in QUIZZES)
 
         logger.info(f"\n{'='*60}")
-        logger.info(f"QUESTION BANK POPULATED SUCCESSFULLY")
+        logger.info("QUESTION BANK POPULATED SUCCESSFULLY")
         logger.info(f"{'='*60}")
         logger.info(f"  Quizzes created  : {total_quizzes}")
         logger.info(f"  Total questions  : {total_questions}")
         logger.info(f"  Modules covered  : {', '.join(sorted(modules))}")
-        logger.info(f"  Difficulties     : facile, moyen, difficile")
+        logger.info("  Difficulties     : facile, moyen, difficile")
         logger.info(f"{'='*60}\n")
 
     except Exception as e:

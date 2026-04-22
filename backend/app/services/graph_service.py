@@ -1,4 +1,5 @@
-from typing import List, Dict, Any, Optional
+from typing import Any
+
 from sqlalchemy.orm import Session
 
 from app.graph.neo4j_connection import Neo4jConnection
@@ -11,7 +12,7 @@ class GraphService:
     Handles concept retrieval, prerequisites, learning paths, and remediation.
     """
 
-    def __init__(self, neo4j: Neo4jConnection, db: Optional[Session] = None):
+    def __init__(self, neo4j: Neo4jConnection, db: Session | None = None):
         """
         Initialize the service.
 
@@ -22,7 +23,7 @@ class GraphService:
         self.neo4j = neo4j
         self.db = db
 
-    def get_all_concepts(self) -> List[Dict[str, Any]]:
+    def get_all_concepts(self) -> list[dict[str, Any]]:
         """
         Retrieve all concepts from the knowledge graph.
 
@@ -39,7 +40,7 @@ class GraphService:
         results = self.neo4j.run_query(query)
         return results
 
-    def get_prerequisites(self, concept_id: str) -> List[Dict[str, Any]]:
+    def get_prerequisites(self, concept_id: str) -> list[dict[str, Any]]:
         """
         Get all prerequisite concepts for a given concept.
 
@@ -59,7 +60,7 @@ class GraphService:
         results = self.neo4j.run_query(query, {"concept_id": concept_id})
         return results
 
-    def generate_learning_path(self, etudiant_id: int) -> Optional[Dict[str, Any]]:
+    def generate_learning_path(self, etudiant_id: int) -> dict[str, Any] | None:
         """
         Generate a personalized learning path for a student based on their mastery levels.
 
@@ -138,7 +139,7 @@ class GraphService:
             }
         }
 
-    def get_remediation(self, concept_id: str) -> List[Dict[str, Any]]:
+    def get_remediation(self, concept_id: str) -> list[dict[str, Any]]:
         """
         Get remediation resources for a concept.
 
@@ -158,7 +159,7 @@ class GraphService:
         results = self.neo4j.run_query(query, {"concept_id": concept_id})
         return results
 
-    def add_concept_to_graph(self, concept_data: Dict[str, Any]) -> bool:
+    def add_concept_to_graph(self, concept_data: dict[str, Any]) -> bool:
         """
         Add a new concept to the knowledge graph.
 

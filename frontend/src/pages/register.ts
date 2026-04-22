@@ -1,5 +1,5 @@
 // ============================================================
-// Register Page — Glassmorphism 3D
+// Register Page — Glassmorphism (English)
 // ============================================================
 
 import { api } from '../api'
@@ -21,22 +21,15 @@ export function RegisterPage(): HTMLElement {
       @keyframes glowPulse { 0%,100%{box-shadow:0 0 30px rgba(129,140,248,0.2)} 50%{box-shadow:0 0 60px rgba(129,140,248,0.4)} }
 
       .auth-wrapper {
-        position:relative;z-index:1;
-        min-height:calc(100vh - 64px);
-        display:flex;align-items:center;justify-content:center;
-        padding:2rem;
+        position:relative;z-index:1;min-height:calc(100vh - 64px);
+        display:flex;align-items:center;justify-content:center;padding:2rem;
       }
-
       .glass-card {
-        background:rgba(15,23,42,0.75);
-        backdrop-filter:blur(40px) saturate(150%);
-        border:1px solid rgba(129,140,248,0.2);
-        border-radius:24px;padding:2.5rem;
-        width:100%;max-width:440px;
-        animation:slideUp 0.6s ease, glowPulse 4s infinite;
+        background:rgba(15,23,42,0.75);backdrop-filter:blur(40px) saturate(150%);
+        border:1px solid rgba(129,140,248,0.2);border-radius:24px;padding:2.5rem;
+        width:100%;max-width:440px;animation:slideUp 0.6s ease, glowPulse 4s infinite;
         box-shadow:0 25px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
       }
-
       .card-header { text-align:center;margin-bottom:2rem; }
       .card-icon {
         width:64px;height:64px;border-radius:18px;
@@ -48,23 +41,17 @@ export function RegisterPage(): HTMLElement {
       .card-title { font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:0.3rem; }
       .card-sub { color:#64748b;font-size:0.85rem; }
 
-      .form-row { display:grid;grid-template-columns:1fr 1fr;gap:1rem; }
       .form-group { margin-bottom:1.1rem;position:relative; }
       .form-label { display:block;color:#94a3b8;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;margin-bottom:0.4rem; }
-      .form-input, .form-select {
+      .form-input {
         width:100%;padding:0.8rem 1rem 0.8rem 2.8rem;
-        background:rgba(255,255,255,0.03);
-        border:1px solid rgba(255,255,255,0.08);
-        border-radius:12px;color:#e2e8f0;font-size:0.9rem;
-        outline:none;transition:all 0.3s;
+        background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+        border-radius:12px;color:#e2e8f0;font-size:0.9rem;outline:none;transition:all 0.3s;
       }
-      .form-select { padding-left:1rem; }
-      .form-input:focus, .form-select:focus {
-        border-color:rgba(129,140,248,0.5);
-        background:rgba(129,140,248,0.05);
+      .form-input:focus {
+        border-color:rgba(129,140,248,0.5);background:rgba(129,140,248,0.05);
         box-shadow:0 0 0 3px rgba(129,140,248,0.1);
       }
-      .form-select option { background:#1e293b;color:#e2e8f0; }
       .input-icon { position:absolute;left:0.9rem;top:50%;transform:translateY(50%);color:#475569;font-size:0.9rem;pointer-events:none; }
 
       .niveau-options { display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem; }
@@ -108,52 +95,47 @@ export function RegisterPage(): HTMLElement {
       <div class="glass-card">
         <div class="card-header">
           <div class="card-icon">🎓</div>
-          <h1 class="card-title">Créer un compte</h1>
-          <p class="card-sub">Rejoignez la plateforme adaptative</p>
+          <h1 class="card-title">Create Account</h1>
+          <p class="card-sub">Join the adaptive learning platform</p>
         </div>
 
         <div class="error-box" id="error-box"></div>
 
         <form id="register-form">
           <div class="form-group">
-            <label class="form-label">NOM COMPLET</label>
+            <label class="form-label">FULL NAME</label>
             <span class="input-icon">👤</span>
-            <input class="form-input" type="text" id="nom" placeholder="Prénom Nom" required/>
+            <input class="form-input" type="text" id="nom" placeholder="First Last" required/>
           </div>
-
           <div class="form-group">
             <label class="form-label">EMAIL</label>
             <span class="input-icon">✉️</span>
-            <input class="form-input" type="email" id="email" placeholder="votre@email.com" required/>
+            <input class="form-input" type="email" id="email" placeholder="your@email.com" required/>
           </div>
-
           <div class="form-group">
-            <label class="form-label">MOT DE PASSE</label>
+            <label class="form-label">PASSWORD</label>
             <span class="input-icon">🔑</span>
-            <input class="form-input" type="password" id="password" placeholder="Minimum 8 caractères" required minlength="8"/>
+            <input class="form-input" type="password" id="password" placeholder="Minimum 8 characters" required minlength="8"/>
             <div class="password-strength" id="pwd-strength"></div>
           </div>
-
           <div class="form-group">
-            <label class="form-label">NIVEAU ACTUEL</label>
+            <label class="form-label">CURRENT LEVEL</label>
             <div class="niveau-options">
-              <button type="button" class="niveau-btn" data-val="debutant">🌱 Débutant</button>
-              <button type="button" class="niveau-btn selected" data-val="intermediaire">⚡ Intermédiaire</button>
-              <button type="button" class="niveau-btn" data-val="avance">🔥 Avancé</button>
+              <button type="button" class="niveau-btn" data-val="beginner">🌱 Beginner</button>
+              <button type="button" class="niveau-btn selected" data-val="intermediate">⚡ Intermediate</button>
+              <button type="button" class="niveau-btn" data-val="advanced">🔥 Advanced</button>
             </div>
-            <input type="hidden" id="niveau" value="intermediaire"/>
+            <input type="hidden" id="niveau" value="intermediate"/>
           </div>
-
-          <button type="submit" class="btn-submit" id="submit-btn">🚀 Créer mon compte</button>
+          <button type="submit" class="btn-submit" id="submit-btn">🚀 Create My Account</button>
         </form>
 
-        <div class="divider">ou</div>
-        <div class="auth-link">Déjà un compte ? <a href="/login" data-link>Se connecter</a></div>
+        <div class="divider">or</div>
+        <div class="auth-link">Already have an account? <a href="/login" data-link>Sign in</a></div>
       </div>
     </div>
   `
 
-  // Niveau buttons
   main.querySelectorAll('.niveau-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       main.querySelectorAll('.niveau-btn').forEach(b => b.classList.remove('selected'))
@@ -162,7 +144,6 @@ export function RegisterPage(): HTMLElement {
     })
   })
 
-  // Password strength
   const pwdInput = main.querySelector('#password') as HTMLInputElement
   const pwdStrength = main.querySelector('#pwd-strength') as HTMLElement
   pwdInput.addEventListener('input', () => {
@@ -174,7 +155,6 @@ export function RegisterPage(): HTMLElement {
     pwdStrength.style.background = colors[strength]
   })
 
-  // Submit
   const form = main.querySelector('#register-form') as HTMLFormElement
   const errorBox = main.querySelector('#error-box') as HTMLElement
   const submitBtn = main.querySelector('#submit-btn') as HTMLButtonElement
@@ -182,7 +162,7 @@ export function RegisterPage(): HTMLElement {
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
     submitBtn.disabled = true
-    submitBtn.textContent = 'Création...'
+    submitBtn.textContent = 'Creating...'
     errorBox.style.display = 'none'
 
     try {
@@ -199,10 +179,10 @@ export function RegisterPage(): HTMLElement {
       stopParticles()
       router.navigate('/dashboard')
     } catch (err: unknown) {
-      errorBox.textContent = '❌ ' + (err instanceof Error ? err.message : 'Erreur lors de l\'inscription')
+      errorBox.textContent = (err instanceof Error ? err.message : 'Registration failed')
       errorBox.style.display = 'block'
       submitBtn.disabled = false
-      submitBtn.textContent = '🚀 Créer mon compte'
+      submitBtn.textContent = '🚀 Create My Account'
     }
   })
 

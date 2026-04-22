@@ -1,5 +1,5 @@
 // ============================================================
-// Home Page — 3D Hero + Animations
+// Home Page — Hero + Animations (English)
 // ============================================================
 
 import { createNavbar } from '../components/navbar'
@@ -17,13 +17,11 @@ export function HomePage(): HTMLElement {
   main.innerHTML = `
     <style>
       @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
-      @keyframes floatDelay { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
       @keyframes gradientShift {
         0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
       }
       @keyframes glowPulse { 0%,100%{opacity:0.4;transform:scale(1)} 50%{opacity:0.8;transform:scale(1.05)} }
       @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
-      @keyframes slideRight { from{opacity:0;transform:translateX(-40px)} to{opacity:1;transform:translateX(0)} }
       @keyframes rotateSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
       @keyframes counterGlow { 0%,100%{text-shadow:0 0 20px #38bdf8} 50%{text-shadow:0 0 40px #818cf8,0 0 60px #38bdf8} }
 
@@ -39,8 +37,7 @@ export function HomePage(): HTMLElement {
         background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.3);
         color:#38bdf8;padding:0.5rem 1.2rem;border-radius:50px;
         font-size:0.8rem;font-weight:600;letter-spacing:0.05em;
-        margin-bottom:2rem;
-        animation:slideUp 0.6s ease forwards;
+        margin-bottom:2rem;animation:slideUp 0.6s ease forwards;
         backdrop-filter:blur(10px);
       }
       .badge-dot {
@@ -51,7 +48,6 @@ export function HomePage(): HTMLElement {
       .hero-title {
         font-size:clamp(2.5rem, 6vw, 5rem);font-weight:900;line-height:1.1;
         max-width:900px;margin:0 auto 1.5rem;
-        animation:slideUp 0.8s 0.2s ease both;
         background:linear-gradient(135deg, #f1f5f9 0%, #38bdf8 40%, #818cf8 70%, #c084fc 100%);
         background-size:300% 300%;
         -webkit-background-clip:text;-webkit-text-fill-color:transparent;
@@ -101,7 +97,6 @@ export function HomePage(): HTMLElement {
         transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,0.3);
       }
 
-      /* Stats */
       .stats-row {
         display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;
         margin-bottom:5rem;animation:slideUp 0.8s 0.8s ease both;
@@ -116,7 +111,6 @@ export function HomePage(): HTMLElement {
       .stat-lbl { color:#64748b;font-size:0.8rem;margin-top:0.2rem;letter-spacing:0.05em; }
       .stat-divider { width:1px;background:rgba(255,255,255,0.08);align-self:stretch; }
 
-      /* Feature cards */
       .features-grid {
         display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
         gap:1.5rem;max-width:1000px;width:100%;
@@ -145,24 +139,16 @@ export function HomePage(): HTMLElement {
       .feature-title { font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;font-size:1rem; }
       .feature-desc { color:#64748b;font-size:0.82rem;line-height:1.6; }
 
-      /* Orbit decoration */
       .orbit-container {
         position:absolute;right:5%;top:50%;transform:translateY(-50%);
         width:350px;height:350px;opacity:0.15;
-        animation:rotateSlow 30s linear infinite;
-        display:none;
+        animation:rotateSlow 30s linear infinite;display:none;
       }
       @media(min-width:1200px){ .orbit-container{display:block;} }
-      .orbit-ring {
-        position:absolute;inset:0;border-radius:50%;
-        border:1px solid rgba(56,189,248,0.6);
-      }
+      .orbit-ring { position:absolute;inset:0;border-radius:50%;border:1px solid rgba(56,189,248,0.6); }
       .orbit-ring:nth-child(2){inset:30px;border-color:rgba(129,140,248,0.5);}
       .orbit-ring:nth-child(3){inset:60px;border-color:rgba(192,132,252,0.4);}
-      .orbit-dot {
-        position:absolute;width:10px;height:10px;border-radius:50%;
-        top:-5px;left:50%;transform:translateX(-50%);
-      }
+      .orbit-dot { position:absolute;width:10px;height:10px;border-radius:50%;top:-5px;left:50%;transform:translateX(-50%); }
       .d1{background:#38bdf8;box-shadow:0 0 15px #38bdf8;}
       .d2{background:#818cf8;box-shadow:0 0 15px #818cf8;top:auto;bottom:-5px;}
       .d3{background:#c084fc;box-shadow:0 0 15px #c084fc;top:50%;left:-5px;}
@@ -175,15 +161,15 @@ export function HomePage(): HTMLElement {
     </div>
 
     <section class="hero-section">
-      <div class="hero-badge"><div class="badge-dot"></div>Projet PFE 2025-2026 · IA + Graphes</div>
+      <div class="hero-badge"><div class="badge-dot"></div>PFE 2025-2026 · AI + Knowledge Graphs</div>
 
-      <h1 class="hero-title">Plateforme d'Apprentissage Adaptatif pour l'Analyse Numérique</h1>
+      <h1 class="hero-title">Adaptive Learning Platform for Numerical Analysis</h1>
 
-      <p class="hero-sub">Parcours personnalisé par graphe de connaissances Neo4j, diagnostic intelligent et remédiation ciblée pour maîtriser le calcul scientifique.</p>
+      <p class="hero-sub">Personalized learning paths powered by a Neo4j knowledge graph, intelligent diagnostics, and targeted remediation to master scientific computing.</p>
 
       <div class="hero-btns">
-        <a href="/register" data-link class="btn-3d-primary">🚀 Commencer gratuitement</a>
-        <a href="/login" data-link class="btn-3d-secondary">Se connecter →</a>
+        <a href="/register" data-link class="btn-3d-primary">🚀 Get Started Free</a>
+        <a href="/login" data-link class="btn-3d-secondary">Sign In →</a>
       </div>
 
       <div class="stats-row">
@@ -191,17 +177,17 @@ export function HomePage(): HTMLElement {
         <div class="stat-divider"></div>
         <div class="stat-item"><div class="stat-num">3</div><div class="stat-lbl">MODULES</div></div>
         <div class="stat-divider"></div>
-        <div class="stat-item"><div class="stat-num">100%</div><div class="stat-lbl">ADAPTATIF</div></div>
+        <div class="stat-item"><div class="stat-num">100%</div><div class="stat-lbl">ADAPTIVE</div></div>
         <div class="stat-divider"></div>
         <div class="stat-item"><div class="stat-num">AI</div><div class="stat-lbl">POWERED</div></div>
       </div>
 
       <div class="features-grid" id="features-grid">
         ${[
-          { icon:'🧠', cls:'fi-blue', t:'Graphe Neo4j', d:'15 concepts organisés avec dépendances pédagogiques: Interpolation, Intégration, EDOs.' },
-          { icon:'🎯', cls:'fi-purple', t:'Parcours Adaptatif', d:'Algorithme intelligent qui recommande le prochain concept selon votre maîtrise.' },
-          { icon:'📊', cls:'fi-green', t:'Suivi Temps Réel', d:'Dashboard avec niveau de maîtrise 0-100% par concept, mis à jour après chaque quiz.' },
-          { icon:'🔧', cls:'fi-pink', t:'Remédiation Ciblée', d:'Ressources automatiquement suggérées via relation REMEDIATES_TO dans Neo4j.' },
+          { icon:'🧠', cls:'fi-blue', t:'Neo4j Graph', d:'15 concepts organized with pedagogical dependencies: Interpolation, Integration, ODEs.' },
+          { icon:'🎯', cls:'fi-purple', t:'Adaptive Path', d:'Intelligent algorithm recommends the next concept based on your mastery level.' },
+          { icon:'📊', cls:'fi-green', t:'Real-Time Tracking', d:'Dashboard with 0-100% mastery per concept, updated after each quiz.' },
+          { icon:'🔧', cls:'fi-pink', t:'Targeted Remediation', d:'Resources automatically suggested via REMEDIATES_TO relations in Neo4j.' },
         ].map(f => `
           <div class="feature-card" data-tilt>
             <div class="feature-icon-wrap ${f.cls}">${f.icon}</div>
@@ -215,19 +201,14 @@ export function HomePage(): HTMLElement {
 
   container.appendChild(main)
 
-  // Apply 3D tilt to feature cards
   setTimeout(() => {
-    main.querySelectorAll('[data-tilt]').forEach(el => {
-      applyTilt(el as HTMLElement, 10)
-    })
+    main.querySelectorAll('[data-tilt]').forEach(el => applyTilt(el as HTMLElement, 10))
   }, 100)
 
-  // Animate stats counter
   const counters = main.querySelectorAll('.stat-num')
   counters.forEach(el => {
     const text = el.textContent || ''
-    const isNum = /^\d+/.test(text)
-    if (!isNum) return
+    if (!/^\d+/.test(text)) return
     const target = parseInt(text)
     let current = 0
     const step = target / 40
@@ -238,7 +219,6 @@ export function HomePage(): HTMLElement {
     }, 30)
   })
 
-  // Cleanup on navigation
   container.addEventListener('remove', stopParticles)
   const origRemove = container.remove.bind(container)
   container.remove = () => { stopParticles(); origRemove() }

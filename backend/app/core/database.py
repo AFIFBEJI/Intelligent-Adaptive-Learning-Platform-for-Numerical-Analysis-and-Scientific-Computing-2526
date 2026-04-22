@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
+
 from app.core.config import get_settings
 
 # URL lue depuis .env - le mot de passe n'est plus visible dans le code!
@@ -25,4 +26,3 @@ def create_tables():
     """Crée les tables dans PostgreSQL au démarrage si elles n'existent pas."""
     Base.metadata.create_all(bind=engine)
 
-    

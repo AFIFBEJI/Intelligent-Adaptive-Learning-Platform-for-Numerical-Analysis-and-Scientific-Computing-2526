@@ -1,8 +1,10 @@
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -25,7 +27,7 @@ def creer_token(data: dict) -> str:
     """Crée un token JWT pour garder l'étudiant connecté."""
     to_encode = data.copy()
     to_encode["sub"] = str(to_encode["sub"])  # ← AJOUTER CETTE LIGNE
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 

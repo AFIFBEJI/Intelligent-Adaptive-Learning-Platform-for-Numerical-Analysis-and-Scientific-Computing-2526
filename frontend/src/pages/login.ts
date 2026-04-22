@@ -1,5 +1,5 @@
 // ============================================================
-// Login Page — Glassmorphism 3D
+// Login Page — Glassmorphism (English)
 // ============================================================
 
 import { api } from '../api'
@@ -19,11 +19,6 @@ export function LoginPage(): HTMLElement {
     <style>
       @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
       @keyframes glowPulse { 0%,100%{box-shadow:0 0 30px rgba(56,189,248,0.2)} 50%{box-shadow:0 0 60px rgba(56,189,248,0.4)} }
-      @keyframes borderGlow {
-        0%{border-color:rgba(56,189,248,0.3)}
-        50%{border-color:rgba(129,140,248,0.6)}
-        100%{border-color:rgba(56,189,248,0.3)}
-      }
 
       .auth-wrapper {
         position:relative;z-index:1;
@@ -47,8 +42,7 @@ export function LoginPage(): HTMLElement {
         background:linear-gradient(135deg,rgba(14,165,233,0.2),rgba(99,102,241,0.2));
         border:1px solid rgba(56,189,248,0.3);
         display:flex;align-items:center;justify-content:center;
-        font-size:1.8rem;margin:0 auto 1rem;
-        animation:glowPulse 3s infinite;
+        font-size:1.8rem;margin:0 auto 1rem;animation:glowPulse 3s infinite;
       }
       .card-title { font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:0.3rem; }
       .card-sub { color:#64748b;font-size:0.85rem; }
@@ -63,8 +57,7 @@ export function LoginPage(): HTMLElement {
         background:rgba(255,255,255,0.03);
         border:1px solid rgba(255,255,255,0.08);
         border-radius:12px;color:#e2e8f0;font-size:0.95rem;
-        outline:none;transition:all 0.3s;
-        backdrop-filter:blur(10px);
+        outline:none;transition:all 0.3s;backdrop-filter:blur(10px);
       }
       .form-input:focus {
         border-color:rgba(56,189,248,0.5);
@@ -82,27 +75,17 @@ export function LoginPage(): HTMLElement {
         color:white;border:none;border-radius:12px;
         font-size:1rem;font-weight:700;cursor:pointer;
         transition:all 0.3s;position:relative;overflow:hidden;
-        box-shadow:0 4px 20px rgba(14,165,233,0.3);
-        margin-top:0.5rem;
+        box-shadow:0 4px 20px rgba(14,165,233,0.3);margin-top:0.5rem;
       }
       .btn-submit::before {
         content:'';position:absolute;inset:0;
-        background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
-        border-radius:inherit;
+        background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);border-radius:inherit;
       }
-      .btn-submit:hover:not(:disabled) {
-        transform:translateY(-2px);
-        box-shadow:0 8px 30px rgba(14,165,233,0.5);
-      }
+      .btn-submit:hover:not(:disabled) { transform:translateY(-2px);box-shadow:0 8px 30px rgba(14,165,233,0.5); }
       .btn-submit:disabled { opacity:0.6;cursor:not-allowed; }
 
-      .divider {
-        display:flex;align-items:center;gap:1rem;margin:1.5rem 0;
-        color:#334155;font-size:0.8rem;
-      }
-      .divider::before,.divider::after {
-        content:'';flex:1;height:1px;background:rgba(255,255,255,0.06);
-      }
+      .divider { display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:#334155;font-size:0.8rem; }
+      .divider::before,.divider::after { content:'';flex:1;height:1px;background:rgba(255,255,255,0.06); }
 
       .auth-link { text-align:center;color:#64748b;font-size:0.85rem; }
       .auth-link a { color:#38bdf8;text-decoration:none;font-weight:600; }
@@ -111,48 +94,40 @@ export function LoginPage(): HTMLElement {
       .error-box {
         background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);
         color:#fca5a5;padding:0.75rem 1rem;border-radius:10px;
-        font-size:0.82rem;margin-bottom:1rem;display:none;
-        animation:slideUp 0.3s ease;
+        font-size:0.82rem;margin-bottom:1rem;display:none;animation:slideUp 0.3s ease;
       }
 
-      .loading-dots::after {
-        content:'';animation:dots 1.5s infinite;
-      }
-      @keyframes dots {
-        0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 100%{content:''}
-      }
+      .loading-dots::after { content:'';animation:dots 1.5s infinite; }
+      @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 100%{content:''} }
     </style>
 
     <div class="auth-wrapper">
       <div class="glass-card">
         <div class="card-header">
           <div class="card-icon">🔐</div>
-          <h1 class="card-title">Connexion</h1>
-          <p class="card-sub">Accédez à votre parcours personnalisé</p>
+          <h1 class="card-title">Sign In</h1>
+          <p class="card-sub">Access your personalized learning path</p>
         </div>
 
         <div class="error-box" id="error-box"></div>
 
         <form id="login-form">
           <div class="form-group">
-            <label class="form-label">ADRESSE EMAIL</label>
+            <label class="form-label">EMAIL ADDRESS</label>
             <span class="input-icon">✉️</span>
-            <input class="form-input" type="email" id="email" placeholder="votre@email.com" required autocomplete="email"/>
+            <input class="form-input" type="email" id="email" placeholder="your@email.com" required autocomplete="email"/>
           </div>
           <div class="form-group">
-            <label class="form-label">MOT DE PASSE</label>
+            <label class="form-label">PASSWORD</label>
             <span class="input-icon">🔑</span>
             <input class="form-input" type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
           </div>
-
-          <button type="submit" class="btn-submit" id="submit-btn">
-            Se connecter
-          </button>
+          <button type="submit" class="btn-submit" id="submit-btn">Sign In</button>
         </form>
 
-        <div class="divider">ou</div>
+        <div class="divider">or</div>
         <div class="auth-link">
-          Pas encore de compte ? <a href="/register" data-link>Créer un compte</a>
+          Don't have an account? <a href="/register" data-link>Create one</a>
         </div>
       </div>
     </div>
@@ -165,7 +140,7 @@ export function LoginPage(): HTMLElement {
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
     submitBtn.disabled = true
-    submitBtn.innerHTML = '<span class="loading-dots">Connexion</span>'
+    submitBtn.innerHTML = '<span class="loading-dots">Signing in</span>'
     errorBox.style.display = 'none'
 
     try {
@@ -180,10 +155,10 @@ export function LoginPage(): HTMLElement {
       stopParticles()
       router.navigate('/dashboard')
     } catch (err: unknown) {
-      errorBox.textContent = '❌ ' + (err instanceof Error ? err.message : 'Email ou mot de passe incorrect')
+      errorBox.textContent = (err instanceof Error ? err.message : 'Invalid email or password')
       errorBox.style.display = 'block'
       submitBtn.disabled = false
-      submitBtn.textContent = 'Se connecter'
+      submitBtn.textContent = 'Sign In'
     }
   })
 

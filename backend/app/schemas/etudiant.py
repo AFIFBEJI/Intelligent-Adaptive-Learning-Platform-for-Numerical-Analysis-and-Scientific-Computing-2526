@@ -1,5 +1,5 @@
+
 from pydantic import BaseModel
-from typing import Optional
 
 
 class EtudiantCreate(BaseModel):
@@ -21,10 +21,10 @@ class EtudiantResponse(BaseModel):
 
 
 class EtudiantUpdate(BaseModel):
-    nom_complet: Optional[str] = None
-    email: Optional[str] = None
-    mot_de_passe: Optional[str] = None
-    niveau_actuel: Optional[str] = None
+    nom_complet: str | None = None
+    email: str | None = None
+    mot_de_passe: str | None = None
+    niveau_actuel: str | None = None
 
 
 class LoginRequest(BaseModel):

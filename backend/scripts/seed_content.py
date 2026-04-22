@@ -10,9 +10,10 @@ Usage:
     python scripts/seed_content.py
 """
 
+import logging
 import os
 import sys
-import logging
+
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
 
@@ -988,12 +989,12 @@ def seed_content():
             rels = result2.single()["count"]
 
             logger.info(f"\n{'='*60}")
-            logger.info(f"MULTI-LEVEL CONTENT CREATED SUCCESSFULLY")
+            logger.info("MULTI-LEVEL CONTENT CREATED SUCCESSFULLY")
             logger.info(f"{'='*60}")
             logger.info(f"  Contents created   : {total}")
             logger.info(f"  HAS_CONTENT rels   : {rels}")
-            logger.info(f"  Levels             : simplified, standard, rigorous")
-            logger.info(f"  Concepts covered   : 15")
+            logger.info("  Levels             : simplified, standard, rigorous")
+            logger.info("  Concepts covered   : 15")
             logger.info(f"{'='*60}\n")
 
     finally:
