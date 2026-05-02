@@ -4,7 +4,7 @@
 
 import { api, Etudiant, LearningPath } from '../api'
 import { createAppShell } from '../components/app-shell'
-import { t } from '../i18n'
+import { t, tLevel } from '../i18n'
 
 function escapeHtml(s: string): string {
   return (s || '')
@@ -30,8 +30,8 @@ export function DashboardPage(): HTMLElement {
   const token = localStorage.getItem('token')
   if (token) api.setToken(token)
 
-  const firstName = user?.nom_complet?.split(' ')[0] || 'Student'
-  const currentLevel = user?.niveau_actuel || 'Intermediate'
+  const firstName = user?.nom_complet?.split(' ')[0] || t('dashboard.student.fallback')
+  const currentLevel = tLevel(user?.niveau_actuel)
 
   const main = document.createElement('div')
   main.innerHTML = `
@@ -60,9 +60,7 @@ export function DashboardPage(): HTMLElement {
       .quick-action {
         position: relative;
         overflow: hidden;
-        background:
-          linear-gradient(180deg, rgba(15, 27, 45, 0.96), rgba(8, 18, 31, 0.94)),
-          linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.06));
+        background: var(--bg-surface);
         border: 1px solid var(--border-default);
         border-radius: var(--radius-md);
         box-shadow: var(--shadow-sm);
@@ -83,9 +81,9 @@ export function DashboardPage(): HTMLElement {
         width: fit-content;
         min-height: 28px;
         padding: 0.25rem 0.62rem;
-        color: var(--brand-100);
-        background: rgba(56, 189, 248, 0.12);
-        border: 1px solid rgba(125, 211, 252, 0.24);
+        color: var(--brand-600);
+        background: rgba(15, 118, 110, 0.1);
+        border: 1px solid rgba(15, 118, 110, 0.22);
         border-radius: var(--radius-md);
         font-size: var(--text-xs);
         font-weight: var(--font-weight-extrabold);
@@ -102,7 +100,7 @@ export function DashboardPage(): HTMLElement {
         font-weight: var(--font-weight-extrabold);
       }
 
-      .hero-title span { color: var(--brand-300); }
+      .hero-title span { color: var(--brand-600); }
 
       .hero-sub {
         margin: 0;
@@ -141,7 +139,7 @@ export function DashboardPage(): HTMLElement {
       }
 
       .level-chip strong,
-      .mini-chip strong { color: var(--brand-100); margin-left: var(--space-2); }
+      .mini-chip strong { color: var(--brand-600); margin-left: var(--space-2); }
 
       .hero-actions {
         display: flex;
@@ -266,9 +264,9 @@ export function DashboardPage(): HTMLElement {
         height: 38px;
         display: grid;
         place-items: center;
-        color: var(--brand-100);
-        background: rgba(56, 189, 248, 0.1);
-        border: 1px solid rgba(125, 211, 252, 0.22);
+        color: var(--brand-600);
+        background: rgba(15, 118, 110, 0.1);
+        border: 1px solid rgba(15, 118, 110, 0.22);
         border-radius: var(--radius-md);
         font-size: var(--text-xs);
         font-weight: var(--font-weight-extrabold);
@@ -433,8 +431,8 @@ export function DashboardPage(): HTMLElement {
         height: 34px;
         display: grid;
         place-items: center;
-        color: var(--brand-100);
-        background: rgba(56, 189, 248, 0.11);
+        color: var(--brand-600);
+        background: rgba(15, 118, 110, 0.1);
         border: 1px solid rgba(125, 211, 252, 0.22);
         border-radius: var(--radius-md);
         font-size: var(--text-xs);
@@ -504,18 +502,18 @@ export function DashboardPage(): HTMLElement {
       <section class="dashboard-hero">
         <div class="hero-panel">
           <div>
-            <div class="hero-kicker">Adaptive learning cockpit</div>
-            <h2 class="hero-title">Bonjour, <span>${escapeHtml(firstName)}</span></h2>
-            <p class="hero-sub">Une vue claire pour reprendre le bon concept, lancer un quiz adapte et obtenir de l'aide au bon moment.</p>
+            <div class="hero-kicker">${t('dashboard.hero.kicker')}</div>
+            <h2 class="hero-title">${t('dashboard.hero.greeting')}, <span>${escapeHtml(firstName)}</span></h2>
+            <p class="hero-sub">${t('dashboard.hero.sub')}</p>
           </div>
           <div class="hero-bottom">
             <div class="level-stack">
-              <span class="level-chip">Niveau <strong>${escapeHtml(currentLevel)}</strong></span>
-              <span class="mini-chip">Mode <strong>Personalise</strong></span>
+              <span class="level-chip">${t('dashboard.hero.level')} <strong>${escapeHtml(currentLevel)}</strong></span>
+              <span class="mini-chip">${t('dashboard.hero.mode')} <strong>${t('dashboard.hero.modeValue')}</strong></span>
             </div>
             <div class="hero-actions">
-              <a href="/quiz-ai" data-link class="ds-btn ds-btn-primary">Generer un quiz</a>
-              <a href="/path" data-link class="ds-btn ds-btn-secondary">Voir le parcours</a>
+              <a href="/quiz-ai" data-link class="ds-btn ds-btn-primary">${t('dashboard.hero.cta.quiz')}</a>
+              <a href="/path" data-link class="ds-btn ds-btn-secondary">${t('dashboard.hero.cta.path')}</a>
             </div>
           </div>
         </div>
@@ -523,17 +521,17 @@ export function DashboardPage(): HTMLElement {
         <aside class="mastery-panel" aria-label="Mastery summary">
           <div class="mastery-head">
             <div>
-              <p class="mastery-label">Maitrise globale</p>
-              <p class="mastery-caption">Basee sur les concepts valides.</p>
+              <p class="mastery-label">${t('dashboard.mastery.title')}</p>
+              <p class="mastery-caption">${t('dashboard.mastery.caption')}</p>
             </div>
           </div>
           <div class="mastery-ring-wrap" id="mastery-ring">
             <svg class="mastery-ring" width="168" height="168" viewBox="0 0 168 168">
               <defs>
                 <linearGradient id="masteryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#7dd3fc"/>
-                  <stop offset="58%" stop-color="#818cf8"/>
-                  <stop offset="100%" stop-color="#34d399"/>
+                  <stop offset="0%" stop-color="#0f766e"/>
+                  <stop offset="58%" stop-color="#2563eb"/>
+                  <stop offset="100%" stop-color="#059669"/>
                 </linearGradient>
               </defs>
               <circle class="mastery-ring-bg" cx="84" cy="84" r="58"/>
@@ -542,9 +540,9 @@ export function DashboardPage(): HTMLElement {
             <div class="mastery-ring-value">0%</div>
           </div>
           <div class="mastery-foot" id="mastery-foot">
-            <div class="mastery-mini"><strong>-</strong><span>Mastered</span></div>
-            <div class="mastery-mini"><strong>-</strong><span>Progress</span></div>
-            <div class="mastery-mini"><strong>-</strong><span>Next</span></div>
+            <div class="mastery-mini"><strong>-</strong><span>${t('dashboard.mastery.mastered')}</span></div>
+            <div class="mastery-mini"><strong>-</strong><span>${t('dashboard.mastery.progress')}</span></div>
+            <div class="mastery-mini"><strong>-</strong><span>${t('dashboard.mastery.next')}</span></div>
           </div>
         </aside>
       </section>
@@ -568,10 +566,10 @@ export function DashboardPage(): HTMLElement {
         <div class="dash-panel">
           <div class="panel-head">
             <div>
-              <h3 class="panel-title">Priorites de revision</h3>
-              <p class="panel-subtitle">Les points faibles a travailler en premier.</p>
+              <h3 class="panel-title">${t('dashboard.priorities.title')}</h3>
+              <p class="panel-subtitle">${t('dashboard.priorities.subtitle')}</p>
             </div>
-            <a href="/content" data-link class="ds-btn ds-btn-secondary">Cours</a>
+            <a href="/content" data-link class="ds-btn ds-btn-secondary">${t('dashboard.priorities.courses')}</a>
           </div>
           <div class="priority-list" id="priority-list">
             ${[1, 2, 3].map(() => `<div class="skeleton sk-card"></div>`).join('')}
@@ -582,8 +580,8 @@ export function DashboardPage(): HTMLElement {
           <div class="dash-panel">
             <div class="panel-head">
               <div>
-                <h3 class="panel-title">Prochaine etape</h3>
-                <p class="panel-subtitle">Concepts prets pour avancer.</p>
+                <h3 class="panel-title">${t('dashboard.next.title')}</h3>
+                <p class="panel-subtitle">${t('dashboard.next.subtitle')}</p>
               </div>
             </div>
             <div class="recommend-list" id="recommend-list">
@@ -597,22 +595,22 @@ export function DashboardPage(): HTMLElement {
         <a href="/concepts" data-link class="quick-action">
           <div class="quick-token">KG</div>
           <div>
-            <h3 class="quick-title">Explorer les concepts</h3>
-            <p class="quick-desc">Voir les modules, niveaux et dependances.</p>
+            <h3 class="quick-title">${t('dashboard.quick.concepts.title')}</h3>
+            <p class="quick-desc">${t('dashboard.quick.concepts.desc')}</p>
           </div>
         </a>
         <a href="/quiz-ai" data-link class="quick-action">
           <div class="quick-token">QZ</div>
           <div>
-            <h3 class="quick-title">S'entrainer</h3>
-            <p class="quick-desc">Generer un quiz cible sur un concept.</p>
+            <h3 class="quick-title">${t('dashboard.quick.train.title')}</h3>
+            <p class="quick-desc">${t('dashboard.quick.train.desc')}</p>
           </div>
         </a>
         <a href="/tutor" data-link class="quick-action">
           <div class="quick-token">AI</div>
           <div>
-            <h3 class="quick-title">Demander au tuteur</h3>
-            <p class="quick-desc">Obtenir une explication adaptee.</p>
+            <h3 class="quick-title">${t('dashboard.quick.tutor.title')}</h3>
+            <p class="quick-desc">${t('dashboard.quick.tutor.desc')}</p>
           </div>
         </a>
       </section>
@@ -634,16 +632,16 @@ export function DashboardPage(): HTMLElement {
 
     const masteryFoot = main.querySelector('#mastery-foot')!
     masteryFoot.innerHTML = `
-      <div class="mastery-mini"><strong>${mastered}</strong><span>Mastered</span></div>
-      <div class="mastery-mini"><strong>${in_progress}</strong><span>Progress</span></div>
-      <div class="mastery-mini"><strong>${toDiscover}</strong><span>Next</span></div>
+      <div class="mastery-mini"><strong>${mastered}</strong><span>${t('dashboard.mastery.mastered')}</span></div>
+      <div class="mastery-mini"><strong>${in_progress}</strong><span>${t('dashboard.mastery.progress')}</span></div>
+      <div class="mastery-mini"><strong>${toDiscover}</strong><span>${t('dashboard.mastery.next')}</span></div>
     `
 
     const metrics = [
-      { token: 'TC', value: total_concepts, label: 'Total concepts', trend: 'Scope' },
-      { token: 'OK', value: mastered, label: 'Mastered', trend: `${masteryPct}%` },
-      { token: 'IP', value: in_progress, label: 'In progress', trend: 'Active' },
-      { token: 'ND', value: toDiscover, label: 'To discover', trend: 'Queued' },
+      { token: 'TC', value: total_concepts, label: t('dashboard.metric.total'), trend: t('dashboard.metric.trend.scope') },
+      { token: 'OK', value: mastered, label: t('dashboard.metric.mastered'), trend: `${masteryPct}%` },
+      { token: 'IP', value: in_progress, label: t('dashboard.metric.inprogress'), trend: t('dashboard.metric.trend.active') },
+      { token: 'ND', value: toDiscover, label: t('dashboard.metric.todiscover'), trend: t('dashboard.metric.trend.queued') },
     ]
 
     const metricsGrid = main.querySelector('#metrics-grid')!
@@ -662,15 +660,15 @@ export function DashboardPage(): HTMLElement {
 
     const priorityList = main.querySelector('#priority-list')!
     if (path.concepts_to_improve.length === 0) {
-      priorityList.innerHTML = `<div class="empty-state"><p>Aucune faiblesse critique pour le moment.</p></div>`
+      priorityList.innerHTML = `<div class="empty-state"><p>${t('dashboard.priorities.empty')}</p></div>`
     } else {
       priorityList.innerHTML = path.concepts_to_improve.slice(0, 5).map((concept) => `
         <article class="priority-item">
           <div>
             <div class="priority-name">${escapeHtml(concept.name)}</div>
             <div class="priority-meta">
-              <span>${escapeHtml(concept.status || 'Needs practice')}</span>
-              <span>${concept.mastery.toFixed(0)}% mastery</span>
+              <span>${escapeHtml(concept.status || t('dashboard.priorities.needsPractice'))}</span>
+              <span>${concept.mastery.toFixed(0)}% ${t('dashboard.priorities.mastery')}</span>
             </div>
           </div>
           <div>
@@ -685,18 +683,18 @@ export function DashboardPage(): HTMLElement {
 
     const recommendList = main.querySelector('#recommend-list')!
     if (path.next_recommended.length === 0) {
-      recommendList.innerHTML = `<div class="empty-state"><p>Termine les revisions en cours pour debloquer la suite.</p></div>`
+      recommendList.innerHTML = `<div class="empty-state"><p>${t('dashboard.next.empty')}</p></div>`
     } else {
       recommendList.innerHTML = path.next_recommended.slice(0, 4).map((concept) => `
         <article class="recommend-item">
           <div>
             <div class="recommend-name">${escapeHtml(concept.name)}</div>
             <div class="recommend-meta">
-              <span>${escapeHtml(concept.category || 'Module')}</span>
-              <span>Level ${escapeHtml(concept.level || '-')}</span>
+              <span>${escapeHtml(concept.category || t('dashboard.next.module'))}</span>
+              <span>${t('dashboard.next.level')} ${escapeHtml(tLevel(concept.level || '-'))}</span>
             </div>
           </div>
-          <span class="recommend-badge">Ready</span>
+          <span class="recommend-badge">${t('dashboard.next.ready')}</span>
         </article>
       `).join('')
     }
@@ -706,8 +704,8 @@ export function DashboardPage(): HTMLElement {
     api.getLearningPath(user.id)
       .then(renderLoaded)
       .catch(() => {
-        main.querySelector('#priority-list')!.innerHTML = `<div class="empty-state"><p>Lance un premier quiz pour creer ton profil de progression.</p></div>`
-        main.querySelector('#recommend-list')!.innerHTML = `<div class="empty-state"><p>Les recommandations apparaitront apres ton diagnostic.</p></div>`
+        main.querySelector('#priority-list')!.innerHTML = `<div class="empty-state"><p>${t('dashboard.error.firstQuiz')}</p></div>`
+        main.querySelector('#recommend-list')!.innerHTML = `<div class="empty-state"><p>${t('dashboard.error.afterDiagnostic')}</p></div>`
       })
   }
 

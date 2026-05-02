@@ -84,5 +84,10 @@ langchain>=0.3.0
 # langchain-ollama : le connecteur LangChain <-> Ollama (modele local)
 # Permet d'utiliser le modele fine-tune gemma-numerical-e2b qui tourne
 # sur ton PC (pas d'internet, pas de quota, RGPD-safe).
-# Mode 100% local depuis avril 2026 — Gemini a ete supprime.
 langchain-ollama>=0.3.0
+
+# langchain-openai : le connecteur LangChain <-> OpenAI (cloud).
+# Active si tu mets LLM_PROVIDER=openai dans .env. Permet d'utiliser
+# GPT-4o-mini ou GPT-4o via l'API OpenAI au lieu d'Ollama local.
+# Pratique pour avoir un fallback haute qualite.
+langchain-openai>=0.2.0

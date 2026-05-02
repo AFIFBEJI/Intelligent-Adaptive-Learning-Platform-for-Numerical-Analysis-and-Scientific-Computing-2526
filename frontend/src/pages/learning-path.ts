@@ -18,7 +18,7 @@ export function LearningPathPage(): HTMLElement {
   const shell = createAppShell({
     activeRoute: '/path',
     pageTitle: t('sidebar.path'),
-    pageSubtitle: 'Recommended sequence based on mastery and prerequisites',
+    pageSubtitle: t('learningPath.subtitle'),
   })
   const container = document.createElement('div')
   const userStr = localStorage.getItem('user')
@@ -39,9 +39,7 @@ export function LearningPathPage(): HTMLElement {
       }
       .overall-bar,
       .module-section {
-        background:
-          linear-gradient(180deg, rgba(15, 27, 45, 0.96), rgba(8, 18, 31, 0.94)),
-          linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.05));
+        background: var(--bg-surface);
         border: 1px solid var(--border-default);
         border-radius: var(--radius-md);
         box-shadow: var(--shadow-sm);
@@ -65,7 +63,7 @@ export function LearningPathPage(): HTMLElement {
         font-size: var(--text-sm);
       }
       .overall-pct {
-        color: var(--brand-300);
+        color: var(--brand-600);
         font-size: var(--text-4xl);
         font-weight: var(--font-weight-extrabold);
         line-height: 1;
@@ -147,7 +145,7 @@ export function LearningPathPage(): HTMLElement {
       }
       .module-progress {
         min-width: 96px;
-        color: var(--brand-300);
+        color: var(--brand-600);
         text-align: right;
         font-size: var(--text-sm);
         font-weight: var(--font-weight-extrabold);
@@ -171,7 +169,7 @@ export function LearningPathPage(): HTMLElement {
       }
       .status-mastered { color: var(--success); background: var(--success-bg); border: 1px solid var(--success-border); }
       .status-progress { color: var(--warning); background: var(--warning-bg); border: 1px solid var(--warning-border); }
-      .status-ready { color: var(--brand-100); background: rgba(56, 189, 248, 0.12); border: 1px solid var(--border-emphasis); }
+      .status-ready { color: var(--brand-600); background: rgba(15, 118, 110, 0.1); border: 1px solid var(--border-emphasis); }
       .status-locked { color: var(--text-muted); background: var(--bg-surface-2); border: 1px solid var(--border-default); }
       .concept-info { min-width: 0; }
       .concept-name {
@@ -184,7 +182,7 @@ export function LearningPathPage(): HTMLElement {
         color: var(--text-muted);
         font-size: var(--text-xs);
       }
-      .concept-prereq.ready { color: var(--brand-300); }
+      .concept-prereq.ready { color: var(--brand-600); }
       .mastery-bar-wrap {
         height: 8px;
         overflow: hidden;
@@ -210,13 +208,13 @@ export function LearningPathPage(): HTMLElement {
         border: 1px solid var(--border-default);
         border-radius: var(--radius-md);
         color: var(--text-primary);
-        background: rgba(21, 36, 58, 0.88);
+        background: var(--bg-surface);
         font-size: var(--text-xs);
         font-weight: var(--font-weight-extrabold);
         text-decoration: none;
         white-space: nowrap;
       }
-      .btn-start { color: #06111f; background: linear-gradient(135deg, #e0f2fe, #7dd3fc); border-color: rgba(125, 211, 252, 0.6); }
+      .btn-start { color: var(--text-on-inverse); background: var(--brand-gradient); border-color: rgba(15, 118, 110, 0.42); }
       .btn-review { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-border); }
       .empty-state {
         min-height: 260px;
@@ -226,7 +224,7 @@ export function LearningPathPage(): HTMLElement {
         padding: var(--space-8);
         color: var(--text-muted);
         text-align: center;
-        background: rgba(15, 27, 45, 0.92);
+        background: var(--bg-surface);
         border: 1px dashed var(--border-default);
         border-radius: var(--radius-md);
       }
@@ -305,8 +303,8 @@ export function LearningPathPage(): HTMLElement {
       <section class="overall-bar">
         <div class="overall-header">
           <div>
-            <div class="overall-label">Overall mastery</div>
-            <div class="overall-caption">Progress calculated from mastered concepts and current work.</div>
+            <div class="overall-label">${t('learningPath.overall')}</div>
+            <div class="overall-caption">${t('learningPath.overall.caption')}</div>
           </div>
           <div class="overall-pct">${pct}%</div>
         </div>
@@ -314,9 +312,9 @@ export function LearningPathPage(): HTMLElement {
           <div class="progress-fill" style="width:${pct}%"></div>
         </div>
         <div class="overall-stats">
-          <div class="overall-stat"><strong>${mastered}</strong>Mastered</div>
-          <div class="overall-stat"><strong>${in_progress}</strong>In progress</div>
-          <div class="overall-stat"><strong>${Math.max(total_concepts - mastered - in_progress, 0)}</strong>To discover</div>
+          <div class="overall-stat"><strong>${mastered}</strong>${t('learningPath.mastered')}</div>
+          <div class="overall-stat"><strong>${in_progress}</strong>${t('learningPath.inprogress')}</div>
+          <div class="overall-stat"><strong>${Math.max(total_concepts - mastered - in_progress, 0)}</strong>${t('learningPath.todiscover')}</div>
         </div>
       </section>
 
@@ -332,10 +330,10 @@ export function LearningPathPage(): HTMLElement {
                 <div class="module-icon ${moduleStyle.cls}">${moduleStyle.icon}</div>
                 <div>
                   <div class="module-name">${escapeHtml(moduleName)}</div>
-                  <div class="module-count">${modMastered}/${moduleConcepts.length} concepts mastered</div>
+                  <div class="module-count">${modMastered}/${moduleConcepts.length} ${t('learningPath.conceptsMastered')}</div>
                 </div>
               </div>
-              <div class="module-progress">${modPct}% complete</div>
+              <div class="module-progress">${modPct}${t('learningPath.percentComplete')}</div>
             </div>
             ${moduleConcepts.map((concept) => {
               const status = getStatus(concept.id)
@@ -349,15 +347,15 @@ export function LearningPathPage(): HTMLElement {
                   <div class="concept-status ${statusCls}">${statusToken}</div>
                   <div class="concept-info">
                     <div class="concept-name">${escapeHtml(concept.name)}</div>
-                    ${status === 'locked' ? '<div class="concept-prereq">Prerequisites not met</div>' : ''}
-                    ${status === 'ready' ? '<div class="concept-prereq ready">Ready to start</div>' : ''}
+                    ${status === 'locked' ? `<div class="concept-prereq">${t('learningPath.prereqLocked')}</div>` : ''}
+                    ${status === 'ready' ? `<div class="concept-prereq ready">${t('learningPath.ready')}</div>` : ''}
                   </div>
                   <div class="mastery-bar-wrap">
                     <div class="mastery-bar ${barCls}" style="width:${mastery}%"></div>
                   </div>
                   <div class="mastery-pct">${mastery > 0 ? mastery.toFixed(0) + '%' : '-'}</div>
-                  ${status === 'ready' ? '<a href="/quiz-ai" data-link class="action-btn btn-start">Start</a>' : ''}
-                  ${status === 'progress' ? '<a href="/quiz-ai" data-link class="action-btn btn-review">Review</a>' : ''}
+                  ${status === 'ready' ? `<a href="/quiz-ai" data-link class="action-btn btn-start">${t('learningPath.cta.quiz')}</a>` : ''}
+                  ${status === 'progress' ? `<a href="/quiz-ai" data-link class="action-btn btn-review">${t('learningPath.cta.quiz')}</a>` : ''}
                 </div>
               `
             }).join('')}
@@ -368,8 +366,8 @@ export function LearningPathPage(): HTMLElement {
   }).catch(() => {
     main.querySelector('#path-content')!.innerHTML = `
       <div class="empty-state">
-        <p>Take your first quiz to generate your personalized learning path.</p>
-        <a href="/quiz-ai" data-link class="ds-btn ds-btn-primary">Go to quizzes</a>
+        <p>${t('learningPath.empty')}</p>
+        <a href="/quiz-ai" data-link class="ds-btn ds-btn-primary">${t('learningPath.cta.quiz')}</a>
       </div>
     `
   })

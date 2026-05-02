@@ -150,22 +150,29 @@ def submit_quiz(
     )
     db.add(quiz_result)
 
-    # 3. ADAPTIVE ALGORITHM: update mastery
-    module = quiz.module
-    difficulte = quiz.difficulte
-    score = result_data.score
+    # ============================================================
+    # GATE : on ne met a jour le mastery QUE si le quiz est en mode
+    # 'adaptive'. En mode 'practice' (entrainement libre), pas d'impact
+    # sur la progression de l'etudiant.
+    # ============================================================
+    quiz_mode = getattr(quiz, "mode", "adaptive") or "adaptive"
+    if quiz_mode == "adaptive":
+        # ADAPTIVE ALGORITHM: update mastery
+        module = quiz.module
+        difficulte = quiz.difficulte
+        score = result_data.score
 
-    # Find the primary concept linked to this quiz
-    concept_id = DIFFICULTY_CONCEPT_MAP.get(module, {}).get(difficulte)
-    if concept_id:
-        update_mastery(db, current_user_id, concept_id, score)
+        # Find the primary concept linked to this quiz
+        concept_id = DIFFICULTY_CONCEPT_MAP.get(module, {}).get(difficulte)
+        if concept_id:
+            update_mastery(db, current_user_id, concept_id, score)
 
-    # If mixed quiz (difficult), update all concepts in the module
-    if difficulte == "difficile" and module in MODULE_CONCEPT_MAP:
-        for cid in MODULE_CONCEPT_MAP[module]:
-            if cid != concept_id:
-                # Reduced impact (50%) for non-targeted concepts
-                update_mastery(db, current_user_id, cid, score * 0.5)
+        # If mixed quiz (difficult), update all concepts in the module
+        if difficulte == "difficile" and module in MODULE_CONCEPT_MAP:
+            for cid in MODULE_CONCEPT_MAP[module]:
+                if cid != concept_id:
+                    # Reduced impact (50%) for non-targeted concepts
+                    update_mastery(db, current_user_id, cid, score * 0.5)
 
     db.commit()
     db.refresh(quiz_result)

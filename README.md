@@ -5,6 +5,7 @@ Plateforme d'apprentissage adaptatif pour l'analyse numerique et le calcul scien
 Le projet combine un backend FastAPI, une SPA TypeScript/Vite, PostgreSQL pour les donnees applicatives, Neo4j pour le graphe de connaissances, et un tuteur IA local via Ollama/LangChain.
 
 ## Stack
+git checkout -b ma-branche
 
 | Zone | Technologies |
 | --- | --- |
@@ -12,7 +13,8 @@ Le projet combine un backend FastAPI, une SPA TypeScript/Vite, PostgreSQL pour l
 | Frontend | TypeScript, Vite |
 | Donnees | PostgreSQL, Neo4j |
 | IA | LangChain, Ollama, GraphRAG |
-| Maths | NumPy, SciPy, SymPy, MathJax/KaTeX |
+| Maths | NumPy, SciPy, SymPy, MathJax/KaTeX |git push -u origin ma-branche
+
 | Dev | Docker Compose, Ruff, Pytest |
 
 ## Structure

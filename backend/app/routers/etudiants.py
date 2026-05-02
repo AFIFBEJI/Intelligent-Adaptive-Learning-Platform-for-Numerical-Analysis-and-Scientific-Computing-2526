@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.i18n import http_msg, lang_from_user
 from app.core.security import get_current_user, hacher_mot_de_passe
 from app.models.etudiant import Etudiant
 from app.schemas.etudiant import EtudiantResponse, EtudiantUpdate
@@ -25,7 +26,8 @@ def lire_un_etudiant(
 ):
     etudiant = db.query(Etudiant).filter(Etudiant.id == etudiant_id).first()
     if etudiant is None:
-        raise HTTPException(status_code=404, detail="Étudiant introuvable.")
+        lang = lang_from_user(db, current_user_id)
+        raise HTTPException(status_code=404, detail=http_msg("etudiant.not_found", lang))
     return etudiant
 
 
@@ -36,13 +38,15 @@ def modifier_etudiant(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-    # Un étudiant ne peut modifier que son propre profil
+    lang = lang_from_user(db, current_user_id)
+
+    # Un etudiant ne peut modifier que son propre profil
     if current_user_id != etudiant_id:
-        raise HTTPException(status_code=403, detail="Vous ne pouvez modifier que votre propre profil.")
+        raise HTTPException(status_code=403, detail=http_msg("etudiant.modify_self_only", lang))
 
     etudiant = db.query(Etudiant).filter(Etudiant.id == etudiant_id).first()
     if etudiant is None:
-        raise HTTPException(status_code=404, detail="Étudiant introuvable.")
+        raise HTTPException(status_code=404, detail=http_msg("etudiant.not_found", lang))
 
     if modifications.nom_complet is not None:
         etudiant.nom_complet = modifications.nom_complet
@@ -66,13 +70,15 @@ def supprimer_etudiant(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-    # Un étudiant ne peut supprimer que son propre compte
+    lang = lang_from_user(db, current_user_id)
+
+    # Un etudiant ne peut supprimer que son propre compte
     if current_user_id != etudiant_id:
-        raise HTTPException(status_code=403, detail="Vous ne pouvez supprimer que votre propre compte.")
+        raise HTTPException(status_code=403, detail=http_msg("etudiant.delete_self_only", lang))
 
     etudiant = db.query(Etudiant).filter(Etudiant.id == etudiant_id).first()
     if etudiant is None:
-        raise HTTPException(status_code=404, detail="Étudiant introuvable.")
+        raise HTTPException(status_code=404, detail=http_msg("etudiant.not_found", lang))
     db.delete(etudiant)
     db.commit()
-    return {"message": f"Étudiant {etudiant_id} supprimé avec succès."}
+    return {"message": http_msg("etudiant.deleted", lang, id=etudiant_id)}
