@@ -19,6 +19,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.i18n import http_msg
 from app.core.security import get_current_user
 from app.models.etudiant import Etudiant
 from app.models.quiz import Quiz, QuizResult
@@ -98,9 +99,10 @@ def _concept_name_from_id(concept_id: str | None) -> str | None:
 def _get_accessible_quiz(db: Session, quiz_id: int, etudiant_id: int) -> Quiz:
     quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
     if not quiz:
+        lang = _user_language(db, etudiant_id)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Quiz {quiz_id} introuvable.",
+            detail=http_msg("quiz.not_found", lang, id=quiz_id),
         )
 
     is_private_generated = (
@@ -147,6 +149,7 @@ async def generate_quiz(
             question_types=request.question_types,
             use_llm=request.use_llm,
             language=request.language or _user_language(db, current_user_id),
+            mode=request.mode,
         )
     except RuntimeError as exc:
         logger.error("Échec génération quiz : %s", exc)
@@ -171,6 +174,7 @@ async def generate_quiz(
         questions=_strip_questions_for_student(quiz.questions or []),
         n_questions=len(quiz.questions or []),
         language=_quiz_language(quiz, request.language or _user_language(db, current_user_id)),
+        mode=getattr(quiz, "mode", "adaptive") or "adaptive",
         date_creation=quiz.date_creation,
     )
 
@@ -233,6 +237,7 @@ async def generate_diagnostic(
         questions=_strip_questions_for_student(quiz.questions or []),
         n_questions=len(quiz.questions or []),
         language=_quiz_language(quiz, _user_language(db, current_user_id)),
+        mode=getattr(quiz, "mode", "adaptive") or "adaptive",
         date_creation=quiz.date_creation,
     )
 
@@ -262,6 +267,7 @@ async def get_quiz(
         questions=_strip_questions_for_student(quiz.questions or []),
         n_questions=len(quiz.questions or []),
         language=_quiz_language(quiz, _user_language(db, current_user_id)),
+        mode=getattr(quiz, "mode", "adaptive") or "adaptive",
         date_creation=quiz.date_creation,
     )
 
@@ -330,12 +336,34 @@ async def submit_quiz(
     )
     db.add(attempt)
 
-    # --- Mise à jour des maîtrises ---
-    feedback_service.update_mastery_from_evaluations(
-        db=db,
-        etudiant_id=current_user_id,
-        evaluations=evaluations,
-    )
+    # ============================================================
+    # GATE : on ne met a jour la maitrise QUE si le quiz est en mode
+    # "adaptive" (parcours officiel). En mode "practice" (entrainement
+    # libre), l'etudiant peut s'amuser avec une difficulte qu'il choisit
+    # sans risquer de plomber sa progression.
+    # ============================================================
+    quiz_mode = getattr(quiz, "mode", "adaptive") or "adaptive"
+    mastery_updated_ids: list[str] = []
+    if quiz_mode == "adaptive":
+        feedback_service.update_mastery_from_evaluations(
+            db=db,
+            etudiant_id=current_user_id,
+            evaluations=evaluations,
+        )
+        # Liste des concepts touches : on dedoublonne tout en preservant
+        # l'ordre d'apparition (utile pour afficher cote frontend
+        # "+12% Lagrange, +8% Newton-Raphson").
+        seen: set[str] = set()
+        for ev in evaluations:
+            cid = ev.concept_id
+            if cid and cid not in seen:
+                seen.add(cid)
+                mastery_updated_ids.append(cid)
+    else:
+        logger.info(
+            "Quiz %d en mode 'practice' : mastery NON mis a jour (entrainement libre).",
+            quiz_id,
+        )
 
     # --- Calibration du niveau global de l'etudiant (quiz diagnostique) ---
     # Quand c'est le quiz diagnostique d'onboarding (module="Diagnostic"),
@@ -345,7 +373,8 @@ async def submit_quiz(
     #   score < 40  -> "Débutant"
     # C'est l'auto-calibration qui remplace le selecteur manuel sur la page
     # d'inscription (l'auto-evaluation est trop biaisee — Dunning-Kruger).
-    if quiz.module == "Diagnostic":
+    # En mode practice on ne calibre pas non plus.
+    if quiz_mode == "adaptive" and quiz.module == "Diagnostic":
         student = (
             db.query(Etudiant).filter(Etudiant.id == current_user_id).first()
         )
@@ -382,6 +411,8 @@ async def submit_quiz(
         feedback_card=card,
         evaluations=evaluations,
         date_tentative=attempt.date_tentative,
+        mode=quiz_mode,
+        mastery_updated=mastery_updated_ids,
     )
 
 
@@ -443,9 +474,10 @@ async def get_attempt(
 ):
     attempt = db.query(QuizResult).filter(QuizResult.id == attempt_id).first()
     if not attempt:
+        lang = _user_language(db, current_user_id)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Tentative {attempt_id} introuvable.",
+            detail=http_msg("quiz.attempt_not_found", lang, id=attempt_id),
         )
     if attempt.etudiant_id != current_user_id:
         raise HTTPException(
@@ -467,6 +499,12 @@ async def get_attempt(
     evals = attempt.evaluation_detaillee or []
     evaluations = [QuestionEvaluation(**e) for e in evals] if evals else []
 
+    # Recupere le mode du quiz original pour que le frontend affiche
+    # le bon bandeau (practice vs adaptive) meme en consultant un attempt
+    # depuis l'historique.
+    original_quiz = db.query(Quiz).filter(Quiz.id == attempt.quiz_id).first()
+    mode = getattr(original_quiz, "mode", "adaptive") if original_quiz else "adaptive"
+
     return QuizSubmitResponse(
         attempt_id=attempt.id,
         quiz_id=attempt.quiz_id,
@@ -474,4 +512,8 @@ async def get_attempt(
         feedback_card=fb,
         evaluations=evaluations,
         date_tentative=attempt.date_tentative,
+        mode=mode or "adaptive",
+        # On ne reconstitue pas mastery_updated depuis l'historique :
+        # ce delta n'a de sens qu'au moment du submit.
+        mastery_updated=[],
     )

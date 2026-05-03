@@ -4,16 +4,22 @@ import { initLangFromUser } from './i18n'
 import { ConceptsPage } from './pages/concepts'
 import { ContentPage } from './pages/content'
 import { DashboardPage } from './pages/dashboard'
+import { ForgotPasswordPage } from './pages/forgot-password'
 import { HomePage } from './pages/home'
 import { LearningPathPage } from './pages/learning-path'
 import { LoginPage } from './pages/login'
 import { OnboardingQuizPage } from './pages/onboarding-quiz'
 import { QuizAiPage } from './pages/quiz-ai'
 import { RegisterPage } from './pages/register'
+import { ResetPasswordPage } from './pages/reset-password'
 import { TutorPage } from './pages/tutor'
+import { VerifyEmailPage } from './pages/verify-email'
 import { router } from './router'
 
 applyDesignTokens()
+// initLangFromUser ne définit AUCUNE langue par défaut si l'utilisateur
+// n'en a jamais choisi : le sélecteur obligatoire au /login et /register
+// se charge de la première sélection.
 initLangFromUser()
 
 const token = localStorage.getItem('token')
@@ -25,6 +31,10 @@ router
   .addRoute('/', HomePage)
   .addRoute('/login', LoginPage)
   .addRoute('/register', RegisterPage)
+  // Phase 3 : 3 nouvelles routes auth (publiques, pas requireAuth)
+  .addRoute('/forgot-password', ForgotPasswordPage)
+  .addRoute('/reset-password', ResetPasswordPage)
+  .addRoute('/verify-email', VerifyEmailPage)
   .addRoute('/dashboard', DashboardPage, true)
   .addRoute('/concepts', ConceptsPage, true)
   .addRoute('/content', ContentPage, true)

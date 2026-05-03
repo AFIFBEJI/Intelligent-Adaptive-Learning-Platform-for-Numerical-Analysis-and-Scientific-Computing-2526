@@ -239,11 +239,11 @@ class FeedbackService:
     async def _eval_open(
         self, question: str, correct: str, student: str
     ) -> tuple[bool, float, str]:
-        """Demande a Ollama (gemma-numerical-e2b) de juger une reponse ouverte."""
-        # Si Ollama indisponible -> fallback exact match
-        if llm_service.ollama_llm is None:
+        """Demande au LLM (Ollama OU OpenAI) de juger une reponse ouverte."""
+        # Si LLM indisponible (peu importe le provider) -> fallback exact match
+        if llm_service.llm is None:
             is_c, pc = self._eval_exact(student, correct)
-            return is_c, pc, "(Evalue par comparaison exacte, Ollama indisponible)"
+            return is_c, pc, f"(Evalue par comparaison exacte, {llm_service.provider} indisponible)"
 
         prompt_text = OPEN_EVAL_PROMPT.format(
             question=question,
@@ -253,9 +253,10 @@ class FeedbackService:
         messages = [HumanMessage(content=prompt_text)]
 
         try:
-            # On utilise format='json' pour forcer une sortie JSON valide
-            ollama_json = llm_service.ollama_llm.bind(format="json")
-            resp = await ollama_json.ainvoke(messages)
+            # bind_json() force la sortie JSON valide quel que soit le provider
+            # (Ollama: format=json, OpenAI: response_format=json_object).
+            llm_json = llm_service.bind_json()
+            resp = await llm_json.ainvoke(messages)
             data = self._extract_json(resp.content)
             return (
                 bool(data.get("is_correct", False)),
@@ -263,7 +264,7 @@ class FeedbackService:
                 str(data.get("explanation", "")),
             )
         except Exception as exc:
-            logger.warning("Echec eval Ollama question ouverte : %s", exc)
+            logger.warning("Echec eval %s question ouverte : %s", llm_service.provider, exc)
             is_c, pc = self._eval_exact(student, correct)
             return is_c, pc, "(Fallback comparaison exacte)"
 

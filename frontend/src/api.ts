@@ -34,6 +34,9 @@ export interface Etudiant {
   langue_preferee: 'en' | 'fr'
   date_inscription: string
   is_active: boolean
+  // Phase 3 : True une fois que l'etudiant a clique le lien dans son
+  // email de verification. Le dashboard peut afficher un bandeau si False.
+  is_verified?: boolean
 }
 
 export interface Concept {
@@ -105,6 +108,9 @@ export interface AiQuizResponse {
   questions: AiQuizQuestion[]
   n_questions: number
   language: 'en' | 'fr'
+  // 'adaptive' = parcours officiel (met a jour le mastery)
+  // 'practice' = entrainement libre (sans impact mastery)
+  mode?: 'adaptive' | 'practice'
   date_creation: string
 }
 
@@ -116,6 +122,8 @@ export interface AiQuizGenerateRequest {
   question_types: AiQuestionType[]
   use_llm?: boolean
   language?: 'en' | 'fr'
+  // 'adaptive' (defaut) ou 'practice' selon ce que l'etudiant choisit.
+  mode?: 'adaptive' | 'practice'
 }
 
 export interface AiStudentAnswer {
@@ -155,6 +163,12 @@ export interface AiQuizSubmitResponse {
   feedback_card: AiFeedbackCard
   evaluations: AiQuestionEvaluation[]
   date_tentative: string
+  // Echo du mode pedagogique du quiz pour que la page de resultat sache
+  // s'il faut afficher le delta mastery (adaptive) ou le bandeau "ce
+  // quiz n'affecte pas la progression" (practice).
+  mode?: 'adaptive' | 'practice'
+  // Liste des concept_ids dont le mastery a ete mis a jour (vide si practice).
+  mastery_updated?: string[]
 }
 
 export interface AiAttemptSummary {
@@ -195,6 +209,35 @@ export interface TutorMessage {
 export interface TutorAskRequest {
   question: string
   concept_id?: string
+  /**
+   * "ollama" | "openai" — choisi via le picker dans la page tuteur.
+   * Si vide, le backend utilise le provider par défaut de .env.
+   */
+  provider?: string
+}
+
+/** Une option LLM retournée par GET /tutor/llm-options. */
+export interface LlmOption {
+  id: string                   // "ollama" ou "openai"
+  name: string                 // ex. "Gemma local (E2B)"
+  model: string                // nom technique du modèle
+  tagline_en: string
+  tagline_fr: string
+  description_en: string
+  description_fr: string
+  requires_internet: boolean
+  is_paid: boolean
+  is_finetuned: boolean
+  speed: 'slow' | 'fast'
+  quality: 'good' | 'excellent'
+  privacy: 'rgpd_safe' | 'cloud'
+  icon: string                 // 'laptop' | 'cloud' (pour le rendu SVG)
+}
+
+export interface LlmOptionsResponse {
+  picker_enabled: boolean
+  default_provider: string
+  available: LlmOption[]
 }
 
 export interface TutorAskResponse {
@@ -245,7 +288,19 @@ class ApiService {
   }
 
   private async raiseApiError(response: Response): Promise<never> {
-    if (response.status === 401) {
+    // Cas 401 special : un token a expire ou le user a ete supprime cote DB.
+    // On nettoie le state et on redirige vers /login. MAIS attention : ce
+    // comportement ne doit PAS s'appliquer aux endpoints d'auth eux-memes
+    // (/auth/login, /auth/register, /auth/forgot-password, etc.). Sinon
+    // un mauvais mot de passe au login declenche un hard-redirect qui
+    // efface le message d'erreur en moins d'une seconde.
+    //
+    // On distingue via l'URL : si la requete vise un endpoint qui commence
+    // par /auth/, on remonte juste l'erreur normalement (sans redirect).
+    const url = response.url || ''
+    const isAuthEndpoint = /\/auth\/(login|register|forgot-password|reset-password|request-verification|verify-email)/.test(url)
+
+    if (response.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
@@ -278,6 +333,29 @@ class ApiService {
     return this.request<TokenResponse>('POST', '/auth/register', data)
   }
 
+  // ============================================================
+  // Phase 3 : verification email + reset password
+  // ============================================================
+  async requestEmailVerification(email: string): Promise<{ message: string; detail?: string }> {
+    return this.request('POST', '/auth/request-verification', { email })
+  }
+
+  async verifyEmail(token: string): Promise<{ message: string; detail?: string }> {
+    // GET endpoint, on encode le token dans l'URL
+    return this.request('GET', `/auth/verify-email/${encodeURIComponent(token)}`)
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string; detail?: string }> {
+    return this.request('POST', '/auth/forgot-password', { email })
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string; detail?: string }> {
+    return this.request('POST', '/auth/reset-password', {
+      token,
+      new_password: newPassword,
+    })
+  }
+
   async getMe(): Promise<Etudiant> {
     return this.request<Etudiant>('GET', '/auth/me')
   }
@@ -292,11 +370,13 @@ class ApiService {
   }
 
   async getConcepts(): Promise<Concept[]> {
-    return this.request<Concept[]>('GET', '/graph/concepts')
+    const lang = localStorage.getItem('app_lang') || 'en'
+    return this.request<Concept[]>('GET', `/graph/concepts?lang=${lang}`)
   }
 
   async getLearningPath(etudiantId: number): Promise<LearningPath> {
-    return this.request<LearningPath>('GET', `/graph/learning-path/${etudiantId}`)
+    const lang = localStorage.getItem('app_lang') || 'en'
+    return this.request<LearningPath>('GET', `/graph/learning-path/${etudiantId}?lang=${lang}`)
   }
 
   async getRemediation(conceptId: string): Promise<unknown> {
@@ -312,6 +392,26 @@ class ApiService {
       'GET',
       `/graph/concepts/${conceptId}/content?${params.toString()}`,
     )
+  }
+
+  /**
+   * Recupere l'URL de l'animation Manim pour un concept donne. Retourne
+   * `null` si aucune animation n'est encore disponible (404 cote backend).
+   * Le frontend doit gerer ce cas en n'affichant tout simplement pas le
+   * lecteur video (la majorite des concepts n'ont pas encore de video).
+   */
+  async getAnimationUrl(conceptId: string): Promise<string | null> {
+    const lang = localStorage.getItem('app_lang') || 'en'
+    try {
+      const data = await this.request<{ url: string; available: boolean }>(
+        'GET',
+        `/animations/${conceptId}?lang=${lang}`,
+      )
+      return data.available ? data.url : null
+    } catch {
+      // 404 attendu si aucune animation. On ne logue pas pour ne pas spammer.
+      return null
+    }
   }
 
   async getQuizList(module?: string, difficulte?: string): Promise<Quiz[]> {
@@ -366,6 +466,10 @@ class ApiService {
 
   async getTutorSessions(): Promise<TutorSession[]> {
     return this.request<TutorSession[]>('GET', '/tutor/sessions')
+  }
+
+  async getLlmOptions(): Promise<LlmOptionsResponse> {
+    return this.request<LlmOptionsResponse>('GET', '/tutor/llm-options')
   }
 
   async askTutor(sessionId: number, data: TutorAskRequest): Promise<TutorAskResponse> {
