@@ -36,15 +36,20 @@ os.environ.setdefault("LLM_MODEL_NAME", "gpt-4o-mini")
 os.environ.setdefault("OPENAI_API_KEY", "test-dummy-key")
 
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
+
+# Note : on NE fait PAS d'import top-level de fastapi/sqlalchemy ici, parce
+# que ce conftest est partage avec d'autres jobs CI (notamment graph-integrity)
+# qui n'installent pas la stack web complete. Les imports lourds restent
+# dans les fixtures qui en ont reellement besoin -> les tests qui n'utilisent
+# pas le TestClient (ex: test_seed_integrity.py) peuvent tourner sans fastapi.
 
 
 @pytest.fixture(scope="session")
 def test_engine():
     """Cree un engine SQLAlchemy SQLite en memoire partage entre threads."""
+    from sqlalchemy import create_engine
+    from sqlalchemy.pool import StaticPool
+
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
@@ -62,6 +67,8 @@ def test_engine():
 @pytest.fixture
 def db_session(test_engine):
     """Une session DB qui rollback apres chaque test pour isolation."""
+    from sqlalchemy.orm import sessionmaker
+
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
     session = TestingSessionLocal()
     try:
@@ -78,6 +85,11 @@ def client(test_engine, monkeypatch):
     On stub aussi les services qui pingent Neo4j ou les LLMs en reseau,
     pour que les tests ne dependent pas d'une infrastructure externe.
     """
+    # Imports lazy : ne sont charges que quand un test utilise vraiment
+    # le client (donc fastapi/sqlalchemy doivent etre installes).
+    from fastapi.testclient import TestClient
+    from sqlalchemy.orm import sessionmaker
+
     # Stub Neo4j connection pour ne pas exiger un Neo4j up.
     import app.graph.neo4j_connection as neo_mod
 

@@ -153,7 +153,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install neo4j python-dotenv
+          # On installe TOUT requirements.txt et pas seulement neo4j+dotenv,
+          # parce que pytest auto-charge tests/conftest.py qui importe
+          # fastapi.testclient + sqlalchemy au module level. Sans ces deps,
+          # le seed integrity test plante avec un ModuleNotFoundError avant
+          # meme d'arriver aux assertions.
+          pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
       - name: Wait for Neo4j
